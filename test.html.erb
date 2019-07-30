@@ -6,17 +6,29 @@
     <% require 'pg' %>
     <% connection = PG::connect(dbname: "goya") %>
     <% connection.internal_encoding = "UTF-8" %>
-    <% result = connection.exec("select * from crops where quality = 'f' and give_for != '自家消費';") %>
-    <% date = [] %>
+    <% result = connection.exec("select * from crops where quality = 'f';") %>
+    <% falseQuality = [] %>
     <% result.each do |record| %>
-      <%  date << "Length: #{record ["length"]}, Weigth: #{record ["weight"]}, Quality: #{record ["quality"]}, Transferer: #{record ["give_for"]}, Date: #{record ["date"]}" %>
+      <%  falseQuality << "Length: #{record ["length"]}, Weigth: #{record ["weight"]}, Quality: #{record ["quality"]}, Transferer: #{record ["give_for"]}, Date: #{record ["date"]}" %>
     <% end %>
-
+    <% result1 = connection.exec("SELECT * FROM crops WHERE give_for != '自家消費';")%>
+    <% noHomeConsumption = [] %>
+    <%result1.each do |record| %>
+      <%  noHomeConsumption << "Length: #{record ["length"]}, Weigth: #{record ["weight"]}, Quality: #{record ["quality"]}, Transferer: #{record ["give_for"]}, Date: #{record ["date"]}" %>
+    <% end %>
+    
+    <form action = "goya.cgi" method = "POST">
+      Press the button which shows every thing where there is no 'Home consumption' <br><br>
+      <!-- Substitute the data you want to send for value -->
+      <!-- Make name = "goya" a mark of information -->
+      <input type = "text" name = "goya" value = "<%= noHomeConsumption.join(' ') %>">
+      <input type = "submit" name = "submit" >
+    </form>
     <form action = "goya.cgi" method = "POST">
       Press the button below to jump to the crops with quality which is false<br><br>
       <!-- Substitute the data you want to send for value -->
       <!-- Make name = "goya" a mark of information -->
-      <input type = "text" name = "goya" value = "<%= date.join(' ') %>">
+      <input type = "text" name = "goya" value = "<%= falseQuality.join(' ') %>">
       <input type = "submit" name = "submit" >
     </form>
   </body>
